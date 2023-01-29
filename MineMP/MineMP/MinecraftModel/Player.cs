@@ -8,5 +8,16 @@ namespace MineMP.MinecraftModel
 {
     internal class Player
     {
+        public static readonly string DefaultName = "Unknown";
+        public static readonly int DefaultNameLength = DefaultName.Length;
+
+        public int NameLength { get; private set; } = DefaultNameLength;
+        public string Name { get; private set; } = DefaultName;
+
+        public Player(int NameLength, string Name)
+        {
+            this.NameLength = NameLength;
+            this.Name = Name;
+        }
     }
 }

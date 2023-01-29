@@ -14,8 +14,8 @@ namespace MineMP
                 string CmdLine = "";
 
                 // Console.Write("Shell>");
-                CmdLine = Console.ReadLine();
-                if (CmdLine.Trim() == string.Empty)
+                CmdLine = Console.ReadLine().Trim();
+                if (CmdLine == string.Empty)
                     continue;
 
                 string[] argv = CmdLine.Split(' ');
@@ -41,10 +41,15 @@ namespace MineMP
                         return;
 
                     case "list":
-                        Console.WriteLine("Total Clients: {0}", server.Clients.Count);
+                        Console.WriteLine("--------------\r\nTotal Clients: {0}", server.Clients.Count);
                         for (int i = 0; i < server.Clients.Count; ++i)
                         {
                             Console.WriteLine("{0}| {1}:{2}", i, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Address, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Port);
+                        }
+                        Console.WriteLine("--------------\r\nTotal Players: {0}", server.Players.Count);
+                        for (int i = 0; i < server.Players.Count; ++i)
+                        {
+                            Console.WriteLine("{0}", server.Players[i].Name);
                         }
                         break;
 

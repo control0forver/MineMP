@@ -127,7 +127,7 @@ namespace MineMP
 
                 if (buffer[0] == 0xFE) // Legacy Minecraft Client Ping in Handshaking
                 {
-                    Console.WriteLine("[Info]Minecraft Client Ping");
+                    Console.WriteLine("[Info]0xFE: Minecraft Client Ping");
                     Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
 
                     List<byte> bytes = new List<byte>();
@@ -153,8 +153,41 @@ namespace MineMP
                     return;
                 }
 
+                if (buffer[0] == 0x02) // Player Join
+                {
+                    Console.WriteLine("[Info]0x02: Minecraft Player Join");
+                    Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+
+                    MinecraftModel.Player player;
+                    int length = 0;
+                    string name = "";
+                    length = buffer[2];
+                    name = Encoding.GetEncoding("UTF-16").GetString(buffer).Substring(2).Substring(0,length);
+                    player = new MinecraftModel.Player(length, name);
+
+                    Console.WriteLine("Name Length: {0}", length);
+                    Console.WriteLine("Name: {0}", name);
+
+                    Players.Add(player);
+
+                    List<byte> bytes = new List<byte>();
+                    // Set Bytes
+                    byte[] bytesBegin = { 0x02, 0x00 };
+                    byte[] bytesUUID = { (byte)length, 0x00 };
+                    byte[] bytesUsername = Encoding.GetEncoding("ASCII").GetBytes(player.Name);
+
+                    // Index Bytes
+                    bytes.AddRange(bytesBegin);
+                    bytes.AddRange(bytesUUID);
+                    bytes.AddRange(bytesUsername);
+
+                    client.Send(bytes.ToArray());
+
+                    return;
+                }
 
                 Console.WriteLine("[DEBUG]message from client:\r\n{0}", BitConverter.ToString(buffer));
+                Console.WriteLine("[DEBUG]Decoded message from client:\r\n{0}", Encoding.GetEncoding("UTF-16").GetString(buffer));
 
             }
         }
