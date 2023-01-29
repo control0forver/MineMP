@@ -13,7 +13,7 @@ namespace MineMP
             {
                 string CmdLine = "";
 
-                Console.Write("Shell>");
+                // Console.Write("Shell>");
                 CmdLine = Console.ReadLine();
                 if (CmdLine.Trim() == string.Empty)
                     continue;
@@ -23,7 +23,8 @@ namespace MineMP
 
                 switch (argv[0])
                 {
-                    default: Console.WriteLine("unknown command: {0}", argv[0]);
+                    default:
+                        Console.WriteLine("unknown command: {0}", argv[0]);
                         break;
 
 
@@ -40,7 +41,7 @@ namespace MineMP
 
                     case "list":
                         Console.WriteLine("Total Clients: {0}", server.Clients.Count);
-                        for (int i = 0;i< server.Clients.Count;++i)
+                        for (int i = 0; i < server.Clients.Count; ++i)
                         {
                             Console.WriteLine("{0}| {1}:{2}", i, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Address, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Port);
                         }

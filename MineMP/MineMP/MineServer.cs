@@ -39,15 +39,6 @@ namespace MineMP
         {
             StopServer = true;
             IsListening = false;
-
-            UpdateAllClient();
-            foreach (Socket Client in Clients)
-            {
-                RemoveClient(Client);
-            }
-
-            Clients.Clear();
-            Socket.Close();
         }
 
         public bool UpdateClient(Socket clientConnect) {
@@ -105,7 +96,7 @@ namespace MineMP
 
             for (; ; )
             {
-                byte[] buffer = new byte[256];
+                byte[] buffer = new byte[512];
                 try
                 {
                     client.Receive(buffer);
@@ -130,7 +121,16 @@ namespace MineMP
                     return;
                 }
 
-                Console.WriteLine("[DEBUG]message from client:\r\n{0}", Encoding.ASCII.GetString(buffer));
+                if (buffer[0] == 0xFE)
+                {
+                    Console.WriteLine("[Info]Minecraft Client Ping");
+                    Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+
+                    client.Send(Encoding.Default.GetBytes("abc6123"));
+                }
+
+                //Console.WriteLine("[DEBUG]message from client:\r\n{0}", BitConverter.ToString(buffer));
+
             }
         }
 
@@ -140,6 +140,16 @@ namespace MineMP
             {
                 AddClient(Socket.Accept());
             }
+
+            // Stop
+            UpdateAllClient();
+            foreach (Socket Client in Clients)
+            {
+                RemoveClient(Client);
+            }
+
+            Clients.Clear();
+            Socket.Close();
         }
 
         public void Broadcast(byte[] bytes)
