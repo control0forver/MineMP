@@ -9,8 +9,12 @@
 
             for (; ; )
             {
+                string CmdLine = "";
+
                 Console.Write("Shell>");
-                Console.ReadLine();
+                CmdLine = Console.ReadLine();
+                if (CmdLine != null)
+                    continue;
             }
         }
     }
