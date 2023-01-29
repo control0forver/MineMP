@@ -43,36 +43,29 @@ namespace MineMP
             UpdateAllClient();
             foreach (Socket Client in Clients)
             {
-                try
-                {
-                    Client.Shutdown(SocketShutdown.Both);
-                }
-                catch (SocketException ex)
-                {
-                    if (ex.ErrorCode != 10057) // SocketException(10057) Maybe Tcping Client
-                    {
-                        Console.WriteLine("[Info]Failed to close client connection.");
-                        Console.WriteLine("Client: {0};{1}", ((IPEndPoint)Client.RemoteEndPoint).Address, ((IPEndPoint)Client.RemoteEndPoint).Port);
-                        Console.WriteLine("Error Message: {0}", ex.Message);
-                    }
-                }
-
-                Client.Close();
+                RemoveClient(Client);
             }
 
             Clients.Clear();
             Socket.Close();
         }
 
+        public bool UpdateClient(Socket clientConnect) {
+            if (clientConnect.Poll(1100, SelectMode.SelectRead))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public void UpdateAllClient()
         {
-            byte[] bs = Encoding.ASCII.GetBytes("test");
             foreach (Socket client in Clients)
             {
-                if (client.Poll(1000, SelectMode.SelectRead))
+                if (!UpdateClient(client))
                 {
-                    client.Close();
-                    Clients.Remove(client);
+                    RemoveClient(client);
                     continue;
                 }
             }
@@ -80,6 +73,21 @@ namespace MineMP
 
         private void RemoveClient(Socket ClientConnect)
         {
+            try
+            {
+                ClientConnect.Shutdown(SocketShutdown.Both);
+            }
+            catch (SocketException ex)
+            {
+                if (ex.ErrorCode != 10057) // SocketException(10057) Maybe Tcping Client
+                {
+                    Console.WriteLine("[Info]Failed to close client connection.");
+                    Console.WriteLine("Client: {0};{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
+                    Console.WriteLine("Error Message: {0}", ex.Message);
+                }
+            }
+            ClientConnect.Close();
+
             Clients.Remove(ClientConnect);
         }
 
@@ -87,6 +95,43 @@ namespace MineMP
         {
             Clients.Add(ClientConnect);
             Console.WriteLine("[Info]New Client Connected: {0}:{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
+
+            new Thread(ClientTcpContent).Start(ClientConnect);
+        }
+
+        private void ClientTcpContent(object o_client)
+        {
+            Socket client = (Socket)o_client;
+
+            for (; ; )
+            {
+                byte[] buffer = new byte[256];
+                try
+                {
+                    client.Receive(buffer);
+                }
+                catch (SocketException ex) { 
+                    if (ex.ErrorCode != 10054)
+                    {
+                        Console.WriteLine("[Info]Failed to close client connection.");
+                        Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+                        Console.WriteLine("Error Message: {0}", ex.Message);
+                    }
+                    Console.WriteLine("Invalid Socket Client Connection.");
+                    RemoveClient(client);
+                    Console.WriteLine("Removed.");
+                    return;
+                }
+                if (!UpdateClient(client))
+                {
+                    Console.WriteLine("\r\nInvalid Socket Client Connection.");
+                    RemoveClient(client);
+                    Console.WriteLine("Removed.");
+                    return;
+                }
+
+                Console.WriteLine("[DEBUG]message from client:\r\n{0}", Encoding.ASCII.GetString(buffer));
+            }
         }
 
         private void ListenClientConnect()
