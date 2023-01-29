@@ -33,6 +33,7 @@ namespace MineMP
                         Console.WriteLine("  help       ----    Show help information");
                         Console.WriteLine("  stop       ----    Stop server && exit shell");
                         Console.WriteLine("  list       ----    List total client connections");
+                        Console.WriteLine("  clear      ----    Clear Console Screen");
                         break;
 
                     case "stop":
@@ -45,6 +46,10 @@ namespace MineMP
                         {
                             Console.WriteLine("{0}| {1}:{2}", i, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Address, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Port);
                         }
+                        break;
+
+                    case "clear":
+                        Console.Clear();
                         break;
                 }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,13 +12,16 @@ namespace MineMP
 
         public Socket Socket { get; private set; }
         public List<Socket> Clients { get; private set; } = new List<Socket>();
+        public List<MinecraftModel.Player> Players { get; private set; } = new List<MinecraftModel.Player>();
         public bool IsListening { get; private set; } = false;
+
+        public string SP_Motd { get; private set; } = "A Minecraft Server";
+        public uint SP_MaxPlayers = 25;
 
         public bool Init(IPAddress address, int port)
         {
             Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             Socket.Bind(new IPEndPoint(address, port));
-
             return true;
         }
         public bool Init()
@@ -41,7 +45,8 @@ namespace MineMP
             IsListening = false;
         }
 
-        public bool UpdateClient(Socket clientConnect) {
+        public bool UpdateClient(Socket clientConnect)
+        {
             if (clientConnect.Poll(1100, SelectMode.SelectRead))
             {
                 return false;
@@ -49,7 +54,6 @@ namespace MineMP
 
             return true;
         }
-
         public void UpdateAllClient()
         {
             foreach (Socket client in Clients)
@@ -61,7 +65,6 @@ namespace MineMP
                 }
             }
         }
-
         private void RemoveClient(Socket ClientConnect)
         {
             try
@@ -70,18 +73,17 @@ namespace MineMP
             }
             catch (SocketException ex)
             {
-                if (ex.ErrorCode != 10057) // SocketException(10057) Maybe Tcping Client
+                if (!SockExHandler(ex))
                 {
                     Console.WriteLine("[Info]Failed to close client connection.");
                     Console.WriteLine("Client: {0};{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
-                    Console.WriteLine("Error Message: {0}", ex.Message);
+                    Console.WriteLine("Error Message({0}): {1}", ex.ErrorCode, ex.Message);
                 }
             }
             ClientConnect.Close();
 
             Clients.Remove(ClientConnect);
         }
-
         private void AddClient(Socket ClientConnect)
         {
             Clients.Add(ClientConnect);
@@ -101,13 +103,15 @@ namespace MineMP
                 {
                     client.Receive(buffer);
                 }
-                catch (SocketException ex) { 
-                    if (ex.ErrorCode != 10054)
+                catch (SocketException ex)
+                {
+                    if (!SockExHandler(ex))
                     {
                         Console.WriteLine("[Info]Failed to close client connection.");
                         Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
-                        Console.WriteLine("Error Message: {0}", ex.Message);
+                        Console.WriteLine("Error Message({0}): {1}", ex.ErrorCode, ex.Message);
                     }
+
                     Console.WriteLine("Invalid Socket Client Connection.");
                     RemoveClient(client);
                     Console.WriteLine("Removed.");
@@ -121,15 +125,36 @@ namespace MineMP
                     return;
                 }
 
-                if (buffer[0] == 0xFE)
+                if (buffer[0] == 0xFE) // Legacy Minecraft Client Ping in Handshaking
                 {
                     Console.WriteLine("[Info]Minecraft Client Ping");
                     Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
 
-                    client.Send(Encoding.Default.GetBytes("abc6123"));
+                    List<byte> bytes = new List<byte>();
+                    // Set Bytes
+                    byte[] bytesSplit = { 0xA7, 0x00 };
+                    byte[] bytesBegin = { 0xFF, 0x00, 0x17, 0x00 };
+                    byte[] bytesMotd = Encoding.GetEncoding("UTF-16").GetBytes(SP_Motd);
+                    byte[] bytesPlayersCount = Encoding.GetEncoding("UTF-16").GetBytes(Players.Count.ToString());
+                    byte[] bytesMaxPlayersLimit = Encoding.GetEncoding("UTF-16").GetBytes(SP_MaxPlayers.ToString());
+
+                    // Index Bytes
+                    bytes.AddRange(bytesBegin);
+                    bytes.AddRange(bytesMotd);
+                    bytes.AddRange(bytesSplit);
+                    bytes.AddRange(bytesPlayersCount);
+                    bytes.AddRange(bytesSplit);
+                    bytes.AddRange(bytesMaxPlayersLimit);
+
+                    // Return Info bytes
+                    client.Send(bytes.ToArray());
+
+                    RemoveClient(client);
+                    return;
                 }
 
-                //Console.WriteLine("[DEBUG]message from client:\r\n{0}", BitConverter.ToString(buffer));
+
+                Console.WriteLine("[DEBUG]message from client:\r\n{0}", BitConverter.ToString(buffer));
 
             }
         }
@@ -150,6 +175,23 @@ namespace MineMP
 
             Clients.Clear();
             Socket.Close();
+        }
+
+        private bool SockExHandler(SocketException ex)
+        {
+            switch (ex.ErrorCode)
+            {
+                default:
+                    return false;
+
+                case 10057: // SocketException(10057) Maybe Tcping Client
+                    break;
+
+                case 10054: // SocketException(10054) Connection Closed by Remote
+                    break;
+            }
+
+            return true;
         }
 
         public void Broadcast(byte[] bytes)

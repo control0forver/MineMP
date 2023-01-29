@@ -1,4 +1,6 @@
-﻿namespace MineMP
+﻿using System.Text;
+
+namespace MineMP
 {
     internal class MineMP
     {
