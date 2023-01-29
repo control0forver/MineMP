@@ -1,11 +1,13 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace MineMP
 {
     internal class MineServer
     {
-        private bool Stopped = true;
+        private bool StopServer = true;
 
         public Socket Socket { get; private set; }
         public List<Socket> Clients { get; private set; } = new List<Socket>();
@@ -27,7 +29,7 @@ namespace MineMP
             if (IsListening)
                 return;
 
-            Stopped = false;
+            StopServer = false;
             IsListening = true;
 
             Socket.Listen(3);
@@ -35,17 +37,46 @@ namespace MineMP
         }
         public void Stop()
         {
-            Stopped = true;
+            StopServer = true;
             IsListening = false;
 
+            UpdateAllClient();
             foreach (Socket Client in Clients)
             {
-                Socket.Shutdown(SocketShutdown.Both);
-                Socket.Close();
+                try
+                {
+                    Client.Shutdown(SocketShutdown.Both);
+                }
+                catch (SocketException ex)
+                {
+                    if (ex.ErrorCode != 10057) // SocketException(10057) Maybe Tcping Client
+                    {
+                        Console.WriteLine("[Info]Failed to close client connection.");
+                        Console.WriteLine("Client: {0};{1}", ((IPEndPoint)Client.RemoteEndPoint).Address, ((IPEndPoint)Client.RemoteEndPoint).Port);
+                        Console.WriteLine("Error Message: {0}", ex.Message);
+                    }
+                }
+
+                Client.Close();
             }
+
+            Clients.Clear();
             Socket.Close();
         }
 
+        public void UpdateAllClient()
+        {
+            byte[] bs = Encoding.ASCII.GetBytes("test");
+            foreach (Socket client in Clients)
+            {
+                if (client.Poll(1000, SelectMode.SelectRead))
+                {
+                    client.Close();
+                    Clients.Remove(client);
+                    continue;
+                }
+            }
+        }
 
         private void RemoveClient(Socket ClientConnect)
         {
@@ -55,11 +86,12 @@ namespace MineMP
         private void AddClient(Socket ClientConnect)
         {
             Clients.Add(ClientConnect);
+            Console.WriteLine("[Info]New Client Connected: {0}:{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
         }
 
         private void ListenClientConnect()
         {
-            for (; !Stopped;)
+            for (; !StopServer;)
             {
                 AddClient(Socket.Accept());
             }

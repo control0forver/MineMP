@@ -28,7 +28,7 @@
             Console.WriteLine("Hello, MineMP!\r\n");
             Console.WriteLine("[Press Any Key to Continue]\r\n");
 
-            Console.ReadKey();
+            Console.ReadKey(true);
             
             // Continued
 
@@ -36,8 +36,8 @@
             RunServer();
             //
 
-
             // We Finished
+            Console.WriteLine("MineMP Finished");
             Environment.Exit(0);
         }
     }
