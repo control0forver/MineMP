@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MineMP.MinecraftModel
 {
-    internal class Player
+    public class Player
     {
         public static readonly string DefaultName = "Unknown";
         public static readonly int DefaultNameLength = DefaultName.Length;

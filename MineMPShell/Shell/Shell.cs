@@ -1,8 +1,14 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using MineMP;
 
-namespace MineMP
+namespace MineMPShell
 {
-    internal static class MineShell
+    internal class Shell
     {
         public static void RunShell(ref MineServer server)
         {

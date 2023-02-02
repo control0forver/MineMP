@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MineMP
 {
-    internal class MineServer
+    public class MineServer
     {
         private bool StopServer = true;
 
@@ -181,6 +181,7 @@ namespace MineMP
                     bytes.AddRange(bytesUUID);
                     bytes.AddRange(bytesUsername);
 
+                    // Send
                     client.Send(bytes.ToArray());
 
                     return;

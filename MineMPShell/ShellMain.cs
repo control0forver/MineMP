@@ -1,12 +1,12 @@
-﻿using System.Text;
+﻿using MineMP;
 
-namespace MineMP
+namespace MineMPShell
 {
-    internal class MineMP
+    internal class ShellMain
     {
         static void RunMineShell(ref MineServer server)
         {
-            MineShell.RunShell(ref server);
+            Shell.RunShell(ref server);
         }
 
         static void RunServer()
@@ -31,7 +31,7 @@ namespace MineMP
             Console.WriteLine("[Press Any Key to Continue]\r\n");
 
             Console.ReadKey(true);
-            
+
             // Continued
 
             // Start Server

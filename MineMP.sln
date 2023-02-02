@@ -3,18 +3,44 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineMP", "MineMP\MineMP.csproj", "{491516D1-7C49-4EF2-8666-C68E3E67E199}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineMPCore", "MineMP\MineMPCore.csproj", "{491516D1-7C49-4EF2-8666-C68E3E67E199}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineMPShell", "MineMPShell\MineMPShell.csproj", "{45868BDA-2172-4F76-98E2-0498F0F32203}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM32 = Debug|ARM32
+		Debug|ARM64 = Debug|ARM64
 		Release|Any CPU = Release|Any CPU
+		Release|ARM32 = Release|ARM32
+		Release|ARM64 = Release|ARM64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Debug|ARM32.Build.0 = Debug|ARM32
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Debug|ARM64.Build.0 = Debug|ARM64
 		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Release|ARM32.ActiveCfg = Release|ARM32
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Release|ARM32.Build.0 = Release|ARM32
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Release|ARM64.ActiveCfg = Release|ARM64
+		{491516D1-7C49-4EF2-8666-C68E3E67E199}.Release|ARM64.Build.0 = Release|ARM64
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Debug|ARM32.Build.0 = Debug|ARM32
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Release|ARM32.ActiveCfg = Release|ARM32
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Release|ARM32.Build.0 = Release|ARM32
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{45868BDA-2172-4F76-98E2-0498F0F32203}.Release|ARM64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

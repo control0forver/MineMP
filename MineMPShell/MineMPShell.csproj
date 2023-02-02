@@ -5,6 +5,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
+    <Platforms>AnyCPU;ARM32;ARM64</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MineMP\MineMPCore.csproj" />
+  </ItemGroup>
 
 </Project>
