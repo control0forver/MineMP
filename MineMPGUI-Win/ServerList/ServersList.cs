@@ -16,10 +16,12 @@ namespace MineMPGUI_Win
         public ServersList()
         {
             InitializeComponent();
+            //Thread.Sleep(1000);
         }
 
         private void ServersList_Shown(object sender, EventArgs e)
         {
+            //Thread.Sleep(1700);
             GUIWinMain.Launcher.Hide();
         }
     }
