@@ -10,6 +10,7 @@ namespace MineMP
     {
         private bool StopServer = true;
 
+        public ConsoleBuffer ConsoleBuffer = new ConsoleBuffer();
         public Socket Socket { get; private set; }
         public List<Socket> Clients { get; private set; } = new List<Socket>();
         public List<MinecraftModel.Player> Players { get; private set; } = new List<MinecraftModel.Player>();
@@ -75,9 +76,9 @@ namespace MineMP
             {
                 if (!SockExHandler(ex))
                 {
-                    Console.WriteLine("[Info]Failed to close client connection.");
-                    Console.WriteLine("Client: {0};{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
-                    Console.WriteLine("Error Message({0}): {1}", ex.ErrorCode, ex.Message);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]Failed to close client connection.");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Error Message({0}): {1}", ex.ErrorCode, ex.Message);
                 }
             }
             ClientConnect.Close();
@@ -87,7 +88,7 @@ namespace MineMP
         private void AddClient(Socket ClientConnect)
         {
             Clients.Add(ClientConnect);
-            Console.WriteLine("[Info]New Client Connected: {0}:{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
+            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]New Client Connected: {0}:{1}", ((IPEndPoint)ClientConnect.RemoteEndPoint).Address, ((IPEndPoint)ClientConnect.RemoteEndPoint).Port);
 
             new Thread(ClientTcpContent).Start(ClientConnect);
         }
@@ -107,28 +108,28 @@ namespace MineMP
                 {
                     if (!SockExHandler(ex))
                     {
-                        Console.WriteLine("[Info]Failed to close client connection.");
-                        Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
-                        Console.WriteLine("Error Message({0}): {1}", ex.ErrorCode, ex.Message);
+                        ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]Failed to close client connection.");
+                        ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+                        ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Error Message({0}): {1}", ex.ErrorCode, ex.Message);
                     }
 
-                    Console.WriteLine("Invalid Socket Client Connection.");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Invalid Socket Client Connection.");
                     RemoveClient(client);
-                    Console.WriteLine("Removed.");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Removed.");
                     return;
                 }
                 if (!UpdateClient(client))
                 {
-                    Console.WriteLine("\r\nInvalid Socket Client Connection.");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "\r\nInvalid Socket Client Connection.");
                     RemoveClient(client);
-                    Console.WriteLine("Removed.");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info,"Removed.");
                     return;
                 }
 
                 if (buffer[0] == 0xFE) // Legacy Minecraft Client Ping in Handshaking
                 {
-                    Console.WriteLine("[Info]0xFE: Minecraft Client Ping");
-                    Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0xFE: Minecraft Client Ping");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info,"Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
 
                     List<byte> bytes = new List<byte>();
                     // Set Bytes
@@ -155,18 +156,18 @@ namespace MineMP
 
                 if (buffer[0] == 0x02) // Player Join
                 {
-                    Console.WriteLine("[Info]0x02: Minecraft Player Join");
-                    Console.WriteLine("Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0x02: Minecraft Player Join");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
 
                     MinecraftModel.Player player;
                     int length = 0;
                     string name = "";
                     length = buffer[2];
-                    name = Encoding.GetEncoding("UTF-16").GetString(buffer).Substring(2).Substring(0,length);
+                    name = Encoding.GetEncoding("UTF-16").GetString(buffer).Substring(2).Substring(0, length);
                     player = new MinecraftModel.Player(length, name);
 
-                    Console.WriteLine("Name Length: {0}", length);
-                    Console.WriteLine("Name: {0}", name);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Name Length: {0}", length);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Name: {0}", name);
 
                     Players.Add(player);
 
@@ -187,8 +188,8 @@ namespace MineMP
                     return;
                 }
 
-                Console.WriteLine("[DEBUG]message from client:\r\n{0}", BitConverter.ToString(buffer));
-                Console.WriteLine("[DEBUG]Decoded message from client:\r\n{0}", Encoding.GetEncoding("UTF-16").GetString(buffer));
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Debug, "[Debug]Message from client:\r\n{0}", BitConverter.ToString(buffer));
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Debug, "Decoded message from client:\r\n{0}", Encoding.GetEncoding("UTF-16").GetString(buffer));
 
             }
         }

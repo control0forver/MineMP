@@ -4,6 +4,7 @@ namespace MineMPShell
 {
     internal class ShellMain
     {
+        static MineServer MineServer;
         static void RunMineShell(ref MineServer server)
         {
             Shell.RunShell(ref server);
@@ -13,15 +14,55 @@ namespace MineMPShell
         {
             Console.WriteLine("[Info]Starting Server");
 
-            var mineServer = new MineServer();
-            mineServer.Init();
-            mineServer.Start();
+            MineServer.Start();
 
             Console.WriteLine("[Info]Server Started");
 
             Console.WriteLine("[Info]Starting Shell");
 
-            RunMineShell(ref mineServer);
+            RunMineShell(ref MineServer);
+        }
+
+        static void SetupCore()
+        {
+            Console.WriteLine("[Info]Setup Core...");
+
+            MineServer = new MineServer();
+            MineServer.ConsoleBuffer.ClearBuffer();
+            MineServer.ConsoleBuffer.ErrorBufferAppended += ConsoleBuffer_ErrorBufferAppended;
+            MineServer.ConsoleBuffer.InfoBufferAppended += ConsoleBuffer_InfoBufferAppended;
+            MineServer.ConsoleBuffer.WarnBufferAppended += ConsoleBuffer_WarnBufferAppended;
+            MineServer.ConsoleBuffer.DebugBufferAppended += ConsoleBuffer_DebugBufferAppended;
+            MineServer.Init();
+
+        }
+
+        private static void ConsoleBuffer_DebugBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        {
+            Console.BackgroundColor = ConsoleColor.Magenta;
+            Console.Out.WriteLine(e.BufferAppending);
+            Console.ResetColor();
+        }
+
+        private static void ConsoleBuffer_WarnBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        {
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.Out.WriteLine(e.BufferAppending);
+            Console.ResetColor();
+        }
+
+        private static void ConsoleBuffer_InfoBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        {
+            Console.BackgroundColor = ConsoleColor.DarkGray;
+            Console.Out.WriteLine(e.BufferAppending);
+            Console.ResetColor();
+        }
+
+        private static void ConsoleBuffer_ErrorBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        {
+            Console.BackgroundColor= ConsoleColor.Red;
+            Console.Error.WriteLine(e.BufferAppending);
+            Console.ResetColor();
         }
 
         static void Main(string[] args)
@@ -35,6 +76,7 @@ namespace MineMPShell
             // Continued
 
             // Start Server
+            SetupCore();
             RunServer();
             //
 
