@@ -1,5 +1,12 @@
 # MineMP
+<image width="300px" height="450px" align="right" src="https://github.com/control0forver/MineMP/blob/master/MineMP/Resources/VersionV.bmp"/>
 A Powerful Minecraft Server For Java-Edition Written in C# with .NET Core
+<p>
+<img src="https://img.shields.io/github/license/control0forver/MineMP.svg?style=flat-square"/>
+<img src="https://img.shields.io/github/repo-size/control0forver/MineMP.svg?style=flat-square"/>
+<img src="https://img.shields.io/github/last-commit/control0forver/MineMP.svg?style=flat-square"/>
+<img src="https://img.shields.io/badge/language-CSharp-yellow.svg?style=flat-square"/>
+</p>
 
 # How to Run
 ## Install .NET Runtime
