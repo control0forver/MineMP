@@ -3,9 +3,9 @@ A Powerful Minecraft Server For Java-Edition Written in C# with .NET Core
 
 # How to Run
 ## Install .NET Runtime
+[Check Microsoft Learn -- How to install .NET Core on platforms](https://learn.microsoft.com/dotnet/core/install/)
 * .NET Version >= 6.0
 
-[Check Microsoft Learn -- How to install .NET Core on platforms](https://learn.microsoft.com/dotnet/core/install/)
 ## Run Mine Shell
 |Platform|Run-Command|
 |:---|:---|
