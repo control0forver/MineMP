@@ -18,5 +18,13 @@ namespace MineMPGUI_Win
 
             BackGround.Image = Image.FromStream(new MemoryStream(MineMP.CoreResc.VersionH));
         }
+
+        private void Launcher_Shown(object sender, EventArgs e)
+        {
+            new Thread(() => {
+                new ServersList().ShowDialog();
+                GUIWinMain.Launcher.Close();
+            }).Start();
+        }
     }
 }

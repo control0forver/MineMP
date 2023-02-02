@@ -37,9 +37,10 @@
             this.BackGround.BackColor = System.Drawing.Color.Transparent;
             this.BackGround.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BackGround.Location = new System.Drawing.Point(0, 0);
-            this.BackGround.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            this.BackGround.Margin = new System.Windows.Forms.Padding(0);
             this.BackGround.Name = "BackGround";
             this.BackGround.Size = new System.Drawing.Size(400, 280);
+            this.BackGround.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.BackGround.TabIndex = 0;
             this.BackGround.TabStop = false;
             // 
@@ -57,6 +58,8 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MineMP GUI Launcher";
+            this.TopMost = true;
+            this.Shown += new System.EventHandler(this.Launcher_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.BackGround)).EndInit();
             this.ResumeLayout(false);
 
