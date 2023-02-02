@@ -1,5 +1,5 @@
 # MineMP
-<!--image width="300px" height="450px" align="right" src="https://github.com/control0forver/MineMP/blob/master/MineMP/Resources/VersionV.bmp"/-->
+<image width="300px" height="450px" align="right" src="https://github.com/control0forver/MineMP/blob/master/MineMP/Resources/VersionV.bmp"/>
 A Powerful Minecraft Server For Java-Edition Written in C# with .NET Core
 <p>
 <img src="https://img.shields.io/github/license/control0forver/MineMP.svg?style=flat-square"/>
