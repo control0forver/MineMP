@@ -14,11 +14,25 @@ namespace MineMPGUI_Win.ServerList
     public partial class ListViewItem : UserControl
     {
         Graphics graph;
-        public ListViewItem()
+
+        public override string Text
+        {
+            get {
+                return this.label1.Text;
+            }
+            set {
+                this.label1.Text = value;
+            }
+        }
+
+        public ListViewItem(string Text="View")
         {
             InitializeComponent();
+
             graph = this.CreateGraphics();
             graph.Clear(this.BackColor);
+
+            this.label1.Text = Text;
         }
 
         private void ListViewItem_MouseEnter(object sender, EventArgs e)

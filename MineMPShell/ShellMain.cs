@@ -1,13 +1,14 @@
 ﻿using MineMP;
+using static MineMP.ConsoleBuffer;
 
 namespace MineMPShell
 {
     internal class ShellMain
     {
         static MineServer MineServer;
-        static void RunMineShell(ref MineServer server)
+        static void RunMineShell()
         {
-            Shell.RunShell(ref server);
+            new Shell().RunShell(ref MineServer);
         }
 
         static void RunServer()
@@ -20,7 +21,7 @@ namespace MineMPShell
 
             Console.WriteLine("[Info]Starting Shell");
 
-            RunMineShell(ref MineServer);
+            RunMineShell();
         }
 
         static void SetupCore()
@@ -33,35 +34,62 @@ namespace MineMPShell
             MineServer.ConsoleBuffer.InfoBufferAppended += ConsoleBuffer_InfoBufferAppended;
             MineServer.ConsoleBuffer.WarnBufferAppended += ConsoleBuffer_WarnBufferAppended;
             MineServer.ConsoleBuffer.DebugBufferAppended += ConsoleBuffer_DebugBufferAppended;
+            MineServer.ConsoleBuffer.ControlSymbolBufferPushed += ConsoleBuffer_ControlSymbolBufferPushed;
+            MineServer.ConsoleBuffer.ReadingInputLine += ConsoleBuffer_ReadingInputLine;
+            MineServer.ConsoleBuffer.ReadingInputLinePeeking += ConsoleBuffer_ReadingInputLinePeeking;
             MineServer.Init();
 
+        }
+
+        // Ignore
+        private static void ConsoleBuffer_ReadingInputLinePeeking()
+        {
+        }
+
+        private static void ConsoleBuffer_ReadingInputLine()
+        {
+            MineServer.ConsoleBuffer.MakeInputLine(Console.ReadLine());
+        }
+
+        private static void ConsoleBuffer_ControlSymbolBufferPushed(ConsoleControlSymbolBufferPushedEventArgs e)
+        {
+            switch (e.BufferPushed)
+            {
+                default: return;
+
+                case ControlSymbols.ClearScreen:
+                    Console.Clear();
+                    break;
+            }
+
+            return;
         }
 
         private static void ConsoleBuffer_DebugBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor = ConsoleColor.Magenta;
-            Console.Out.WriteLine(e.BufferAppending);
+            Console.Out.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 
         private static void ConsoleBuffer_WarnBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;
-            Console.Out.WriteLine(e.BufferAppending);
+            Console.Out.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 
         private static void ConsoleBuffer_InfoBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor = ConsoleColor.DarkGray;
-            Console.Out.WriteLine(e.BufferAppending);
+            Console.Out.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 
         private static void ConsoleBuffer_ErrorBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor= ConsoleColor.Red;
-            Console.Error.WriteLine(e.BufferAppending);
+            Console.Error.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 

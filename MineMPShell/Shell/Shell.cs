@@ -8,19 +8,19 @@ using MineMP;
 
 namespace MineMPShell
 {
-    internal class Shell
+    public class Shell
     {
-        public static void RunShell(ref MineServer server)
+        public void RunShell(ref MineServer server)
         {
-            Console.WriteLine("\r\nWelcome To Mine Shell!");
-            Console.WriteLine("Type \"help\" for more information.");
+            server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info,"\r\nWelcome To Mine Shell!");
+            server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "Type \"help\" for more information.");
 
             for (; ; )
             {
                 string CmdLine = "";
 
                 // Console.Write("Shell>");
-                CmdLine = Console.ReadLine().Trim();
+                CmdLine = server.ConsoleBuffer.ReadLine().Trim();
                 if (CmdLine == string.Empty)
                     continue;
 
@@ -30,16 +30,16 @@ namespace MineMPShell
                 switch (argv[0])
                 {
                     default:
-                        Console.WriteLine("unknown command: {0}", argv[0]);
+                        server.ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "unknown command: {0}", argv[0]);
                         break;
 
 
                     case "help":
-                        Console.WriteLine("Help|Commands:");
-                        Console.WriteLine("  help       ----    Show help information");
-                        Console.WriteLine("  stop       ----    Stop server && exit shell");
-                        Console.WriteLine("  list       ----    List total client connections");
-                        Console.WriteLine("  clear      ----    Clear Console Screen");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "Help|Commands:");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "  help       ----    Show help information");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "  stop       ----    Stop server && exit shell");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "  list       ----    List total client connections");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "  clear      ----    Clear Console Screen");
                         break;
 
                     case "stop":
@@ -47,20 +47,28 @@ namespace MineMPShell
                         return;
 
                     case "list":
-                        Console.WriteLine("--------------\r\nTotal Clients: {0}", server.Clients.Count);
+                        server.ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info,"--------------\r\nTotal Clients: {0}", server.Clients.Count);
                         for (int i = 0; i < server.Clients.Count; ++i)
                         {
-                            Console.WriteLine("{0}| {1}:{2}", i, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Address, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Port);
+                            server.ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "{0}| {1}:{2}", i, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Address, ((IPEndPoint)server.Clients[i].RemoteEndPoint).Port);
                         }
-                        Console.WriteLine("--------------\r\nTotal Players: {0}", server.Players.Count);
+                        server.ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "--------------\r\nTotal Players: {0}", server.Players.Count);
                         for (int i = 0; i < server.Players.Count; ++i)
                         {
-                            Console.WriteLine("{0}", server.Players[i].Name);
+                            server.ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "{0}", server.Players[i].Name);
                         }
                         break;
 
+                    case "test":
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.None, "None");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "Info");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Error, "Error");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Warn, "Warn");
+                        server.ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Debug, "Debug");
+                        break;
+
                     case "clear":
-                        Console.Clear();
+                        server.ConsoleBuffer.MakeControl(ConsoleBuffer.ControlSymbols.ClearScreen);
                         break;
                 }
 

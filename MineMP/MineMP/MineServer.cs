@@ -8,6 +8,7 @@ namespace MineMP
 {
     public class MineServer
     {
+        public bool ShouldDispose { get; private set; } = false;
         private bool StopServer = true;
 
         public ConsoleBuffer ConsoleBuffer = new ConsoleBuffer();
@@ -42,8 +43,10 @@ namespace MineMP
         }
         public void Stop()
         {
+            Socket.Close();
             StopServer = true;
             IsListening = false;
+            ShouldDispose = true;
         }
 
         public bool UpdateClient(Socket clientConnect)
@@ -198,7 +201,13 @@ namespace MineMP
         {
             for (; !StopServer;)
             {
-                AddClient(Socket.Accept());
+                try
+                {
+                    AddClient(Socket.Accept());
+                }
+                catch (Exception)
+                {
+                }
             }
 
             // Stop
@@ -209,7 +218,6 @@ namespace MineMP
             }
 
             Clients.Clear();
-            Socket.Close();
         }
 
         private bool SockExHandler(SocketException ex)

@@ -28,4 +28,8 @@
     <Folder Include="Resources\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Qoollo.Turbo" Version="3.1.0" />
+  </ItemGroup>
+
 </Project>
