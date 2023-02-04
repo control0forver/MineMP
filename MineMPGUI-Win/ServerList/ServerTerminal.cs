@@ -122,7 +122,7 @@ namespace MineMPGUI_Win.ServerList
 
                 // Start Server
                 SetupCore();
-                //RunServer();
+                RunServer();
                 //
 
                 // We Finished
