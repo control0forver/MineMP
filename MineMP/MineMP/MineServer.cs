@@ -12,23 +12,37 @@ namespace MineMP
         private bool StopServer = true;
 
         public ConsoleBuffer ConsoleBuffer = new ConsoleBuffer();
-        public Socket Socket { get; private set; }
+        public Socket Socket { get; private set; } = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public List<Socket> Clients { get; private set; } = new List<Socket>();
         public List<MinecraftModel.Player> Players { get; private set; } = new List<MinecraftModel.Player>();
         public bool IsListening { get; private set; } = false;
 
         public string SP_Motd { get; private set; } = "A Minecraft Server";
-        public uint SP_MaxPlayers = 25;
+        public uint SP_MaxPlayers { get; private set; } = 25;
+        public short SP_Port { get; private set; } = 25565;
 
-        public bool Init(IPAddress address, int port)
+        public void LoadServerConfig(ConfigFile configFile)
         {
-            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            Socket.Bind(new IPEndPoint(address, port));
-            return true;
+            configFile.Load();
+            SP_Motd = configFile.KeyGetString("Motd");
+            SP_MaxPlayers = configFile.KeyGetUInt("MaxPlayers");
+            SP_Port = (short)configFile.KeyGetInt("Port");
+        }
+        private void MakeDefaultServerConfig()
+        {
+            ConfigFile configFile = new ConfigFile();
+            configFile.UseFile("ServerConfig.txt");
+            configFile.Load();
+            configFile.Default("Motd", SP_Motd);
+            configFile.Default("MaxPlayers", SP_MaxPlayers);
+            configFile.Default("Port", SP_Port);
         }
         public bool Init()
         {
-            return Init(IPAddress.Any, 25565);
+            ConsoleBuffer.AppendBuffer(ConsoleBuffer.BufferContentType.Info, "Loading Server Config");
+            MakeDefaultServerConfig();
+            LoadServerConfig(ConfigFile.FormFile("ServerConfig.txt"));
+            return true;
         }
         public void Start()
         {
@@ -38,6 +52,7 @@ namespace MineMP
             StopServer = false;
             IsListening = true;
 
+            Socket.Bind(new IPEndPoint(IPAddress.Any, SP_Port));
             Socket.Listen(3);
             new Thread(ListenClientConnect).Start();
         }
@@ -125,14 +140,14 @@ namespace MineMP
                 {
                     ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "\r\nInvalid Socket Client Connection.");
                     RemoveClient(client);
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info,"Removed.");
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Removed.");
                     return;
                 }
 
                 if (buffer[0] == 0xFE) // Legacy Minecraft Client Ping in Handshaking
                 {
                     ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0xFE: Minecraft Client Ping");
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info,"Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
 
                     List<byte> bytes = new List<byte>();
                     // Set Bytes
