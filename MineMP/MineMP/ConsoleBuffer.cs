@@ -155,7 +155,7 @@ namespace MineMP
             InputBuffers.Add(input_line);
             InputBufferPushed(new ConsoleInputBuffeePushedEventArgs(input_line));
         }
-        public string ReadLine(bool emptyBuffer = false,bool peeking = false)
+        public string ReadLine(bool emptyBuffer = false, bool peeking = false)
         {
             if (emptyBuffer)
                 Clear();
