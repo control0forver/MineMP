@@ -21,12 +21,19 @@ namespace MineMP
         public uint SP_MaxPlayers { get; private set; } = 25;
         public short SP_Port { get; private set; } = 25565;
 
-        public void LoadServerConfig(ConfigFile configFile)
+        public void LoadServerConfig(ConfigFile configFile, bool display_configs = true)
         {
             configFile.Load();
             SP_Motd = configFile.KeyGetString("Motd");
             SP_MaxPlayers = configFile.KeyGetUInt("MaxPlayers");
             SP_Port = (short)configFile.KeyGetInt("Port");
+
+            if (display_configs)
+            {
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[ConfigFile] Motd: {0}", SP_Motd);
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[ConfigFile] MaxPlayers: {0}", SP_MaxPlayers);
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[ConfigFile] Port: {0}", SP_Port);
+            }
         }
         private void MakeDefaultServerConfig()
         {
@@ -36,6 +43,7 @@ namespace MineMP
             configFile.Default("Motd", SP_Motd);
             configFile.Default("MaxPlayers", SP_MaxPlayers);
             configFile.Default("Port", SP_Port);
+            configFile.Save();
         }
         public bool Init()
         {

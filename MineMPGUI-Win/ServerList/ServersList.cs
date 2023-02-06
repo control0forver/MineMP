@@ -1,4 +1,5 @@
-﻿using MineMPGUI_Win.ServerList;
+﻿using MineMP;
+using MineMPGUI_Win.ServerList;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,7 +37,7 @@ namespace MineMPGUI_Win
 
         private void btn_min_Click(object sender, EventArgs e)
         {
-            this.WindowState= FormWindowState.Minimized;
+            this.WindowState = FormWindowState.Minimized;
         }
 
         private void btn_close_Click(object sender, EventArgs e)
@@ -46,7 +47,11 @@ namespace MineMPGUI_Win
 
         private void btn_create_new_Click(object sender, EventArgs e)
         {
+            MakeServer makeServer = new MakeServer();
+            if (!makeServer.MakeDialog(out string path))
+                return;
             ServerTerminal serverTerminal = new ServerTerminal();
+            serverTerminal.MineServer.LoadServerConfig(ConfigFile.FormFile(path));
             flowLayoutPanel1.Controls.Add(serverTerminal.MiniView);
             servers.Add(serverTerminal);
         }
@@ -58,7 +63,7 @@ namespace MineMPGUI_Win
 
         private void ServersList_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (servers.Count> 0)
+            if (servers.Count > 0)
             {
                 e.Cancel = true;
                 MessageBox.Show("You must stop all servers before closing!");

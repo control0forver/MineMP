@@ -50,7 +50,7 @@ namespace MineMP
 
             if (!File.Exists(FilePath))
             {
-                File.CreateText(FilePath);
+                File.Create(FilePath).Close();
             }
 
             lines.AddRange(File.ReadAllLines(FilePath, encoding));
@@ -71,7 +71,7 @@ namespace MineMP
 
             if (!File.Exists(FilePath))
             {
-                File.CreateText(FilePath);
+                File.CreateText(FilePath).Close();
             }
 
             foreach (string key in configs.Keys)
@@ -135,6 +135,11 @@ namespace MineMP
             if (value == null)
                 value = string.Empty;
 
+            if (!configs.ContainsKey(key))
+            {
+                Add(key, value);
+                return;
+            }    
             if (configs[key] == null || configs[key] == string.Empty || !configs.ContainsKey(key))
                 Add(key, value);
         }
