@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MineMPCore.MineMP.MinecraftModel
+namespace MineMP.MinecraftModel
 {
-    internal class World
+    public class World
     {
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using MineMP.MinecraftModel;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -122,13 +123,19 @@ namespace MineMP
         private void ClientTcpContent(object o_client)
         {
             Socket client = (Socket)o_client;
-
+            
             for (; ; )
             {
-                byte[] buffer = new byte[512];
+                List<byte> buffer = new List<byte>();
                 try
                 {
-                    client.Receive(buffer);
+                    byte[] _buf = new byte[1024];
+                    int bytesCount = client.Receive(_buf);
+
+                    if (bytesCount > 0)
+                    {
+                        buffer.AddRange(_buf.Take(bytesCount));
+                    }
                 }
                 catch (SocketException ex)
                 {
@@ -152,70 +159,82 @@ namespace MineMP
                     return;
                 }
 
-                if (buffer[0] == 0xFE) // Legacy Minecraft Client Ping in Handshaking
+                // Maybe Got Package
+                // And Start Process For It
+
+                Protocol package = new Protocol(buffer);
+                package.Process();
+
+                switch (package.PackageID)
                 {
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0xFE: Minecraft Client Ping");
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+                    default:break;
 
-                    List<byte> bytes = new List<byte>();
-                    // Set Bytes
-                    byte[] bytesSplit = { 0xA7, 0x00 };
-                    byte[] bytesBegin = { 0xFF, 0x00, 0x17, 0x00 };
-                    byte[] bytesMotd = Encoding.GetEncoding("UTF-16").GetBytes(SP_Motd);
-                    byte[] bytesPlayersCount = Encoding.GetEncoding("UTF-16").GetBytes(Players.Count.ToString());
-                    byte[] bytesMaxPlayersLimit = Encoding.GetEncoding("UTF-16").GetBytes(SP_MaxPlayers.ToString());
+                    case 0xFE:
+                        {
+                            // Legacy Minecraft Client Ping in Handshaking
+                            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0xFE: Minecraft Client Ping");
+                            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
 
-                    // Index Bytes
-                    bytes.AddRange(bytesBegin);
-                    bytes.AddRange(bytesMotd);
-                    bytes.AddRange(bytesSplit);
-                    bytes.AddRange(bytesPlayersCount);
-                    bytes.AddRange(bytesSplit);
-                    bytes.AddRange(bytesMaxPlayersLimit);
+                            List<byte> bytes = new List<byte>();
+                            // Set Bytes
+                            byte[] bytesSplit = { 0xA7, 0x00 };
+                            byte[] bytesBegin = { 0xFF, 0x00, 0x17, 0x00 };
+                            byte[] bytesMotd = Encoding.GetEncoding("UTF-16").GetBytes(SP_Motd);
+                            byte[] bytesPlayersCount = Encoding.GetEncoding("UTF-16").GetBytes(Players.Count.ToString());
+                            byte[] bytesMaxPlayersLimit = Encoding.GetEncoding("UTF-16").GetBytes(SP_MaxPlayers.ToString());
 
-                    // Return Info bytes
-                    client.Send(bytes.ToArray());
+                            // Index Bytes
+                            bytes.AddRange(bytesBegin);
+                            bytes.AddRange(bytesMotd);
+                            bytes.AddRange(bytesSplit);
+                            bytes.AddRange(bytesPlayersCount);
+                            bytes.AddRange(bytesSplit);
+                            bytes.AddRange(bytesMaxPlayersLimit);
 
-                    RemoveClient(client);
-                    return;
+                            // Return Info bytes
+                            client.Send(bytes.ToArray());
+
+                            RemoveClient(client);
+                            return;
+                        }
+
+                    case 0x02: // Player Join
+                        {
+                            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0x02: Minecraft Player Join");
+                            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
+
+                            MinecraftModel.Player player;
+                            int length = 0;
+                            string name = "";
+                            length = package.Data[2];
+                            name = Encoding.GetEncoding("UTF-16").GetString(package.Data.ToArray()).Substring(2).Substring(0, length);
+                            player = new MinecraftModel.Player(length, name);
+
+                            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Name Length: {0}", length);
+                            ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Name: {0}", name);
+
+                            Players.Add(player);
+
+                            List<byte> bytes = new List<byte>();
+                            // Set Bytes
+                            byte[] bytesBegin = { 0x02, 0x00 };
+                            byte[] bytesUUID = { (byte)length, 0x00 };
+                            byte[] bytesUsername = Encoding.GetEncoding("ASCII").GetBytes(player.Name);
+
+                            // Index Bytes
+                            bytes.AddRange(bytesBegin);
+                            bytes.AddRange(bytesUUID);
+                            bytes.AddRange(bytesUsername);
+
+                            // Send
+                            client.Send(bytes.ToArray());
+
+                            return;
+                        }
                 }
 
-                if (buffer[0] == 0x02) // Player Join
-                {
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "[Info]0x02: Minecraft Player Join");
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Client: {0};{1}", ((IPEndPoint)client.RemoteEndPoint).Address, ((IPEndPoint)client.RemoteEndPoint).Port);
-
-                    MinecraftModel.Player player;
-                    int length = 0;
-                    string name = "";
-                    length = buffer[2];
-                    name = Encoding.GetEncoding("UTF-16").GetString(buffer).Substring(2).Substring(0, length);
-                    player = new MinecraftModel.Player(length, name);
-
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Name Length: {0}", length);
-                    ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Info, "Name: {0}", name);
-
-                    Players.Add(player);
-
-                    List<byte> bytes = new List<byte>();
-                    // Set Bytes
-                    byte[] bytesBegin = { 0x02, 0x00 };
-                    byte[] bytesUUID = { (byte)length, 0x00 };
-                    byte[] bytesUsername = Encoding.GetEncoding("ASCII").GetBytes(player.Name);
-
-                    // Index Bytes
-                    bytes.AddRange(bytesBegin);
-                    bytes.AddRange(bytesUUID);
-                    bytes.AddRange(bytesUsername);
-
-                    // Send
-                    client.Send(bytes.ToArray());
-
-                    return;
-                }
-
-                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Debug, "[Debug]Message from client:\r\n{0}", BitConverter.ToString(buffer));
-                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Debug, "Decoded message from client:\r\n{0}", Encoding.GetEncoding("UTF-16").GetString(buffer));
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Debug, "[Debug]Message from client:\r\n{0}", BitConverter.ToString(package.Data.ToArray()));
+                ConsoleBuffer.AppendFormatBuffer(ConsoleBuffer.BufferContentType.Debug, "Decoded message from client:\r\n{0}", Encoding.GetEncoding("UTF-16").GetString(package.Data.ToArray()));
 
             }
         }
