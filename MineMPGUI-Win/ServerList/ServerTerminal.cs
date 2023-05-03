@@ -193,7 +193,7 @@ namespace MineMPGUI_Win.ServerList
 
         private void ServerTerminal_KeyDown(object sender, KeyEventArgs e)
         {
-            // Auto Focus
+            // Auto Focus 
             /*
             if (!textBox1.Focused)
             {
