@@ -168,15 +168,15 @@ namespace MineMPGUI_Win.ServerList
                             break;
                     }
 
-                    str = str.Remove(0, str.IndexOf('|')+1);
+                    str = str.Remove(0, str.IndexOf('|') + 1);
                 }
 
-                RectangleF rf = new RectangleF(e.Bounds.X, e.Bounds.Y, e.Graphics.MeasureString(str,e.Font).Width, e.Font.Height * str.Split("\n").Length);
+                RectangleF rf = new RectangleF(e.Bounds.X, e.Bounds.Y, e.Graphics.MeasureString(str, e.Font).Width, e.Font.Height * str.Split("\n").Length);
                 e.Graphics.FillRectangle(new SolidBrush(back_color), rf);
                 e.Graphics.DrawString(str, e.Font, new SolidBrush(e.ForeColor), rf, StringFormat.GenericDefault);
             }
         }
-        
+
         private void ServerTerminal_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (MineServer.ShouldDispose)
@@ -189,6 +189,17 @@ namespace MineMPGUI_Win.ServerList
         private void listBox_MeasureItem(object sender, MeasureItemEventArgs e)
         {
             e.ItemHeight = listBox.Font.Height * listBox.Items[e.Index].ToString().Split("\n").Length;
+        }
+
+        private void ServerTerminal_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Auto Focus
+            /*
+            if (!textBox1.Focused)
+            {
+                textBox1.Focus();
+                textBox1.Text.Append((char)e.KeyValue);
+            }*/
         }
     }
 }
