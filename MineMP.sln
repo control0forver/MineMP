@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineMPShell", "MineMPShell\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MineMPGUI-Win", "MineMPGUI-Win\MineMPGUI-Win.csproj", "{FA0529D1-316D-4F91-9FED-2BB984F34341}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{8C3F6449-AE34-48E0-8811-368868DC7B7F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MineMPCore", "MineMPCore", "{77470B8C-2038-4B41-8F43-D6CB7051E6A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +90,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{77470B8C-2038-4B41-8F43-D6CB7051E6A7} = {8C3F6449-AE34-48E0-8811-368868DC7B7F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4E08B9E2-4381-4A62-8E9E-D6A675D4E445}

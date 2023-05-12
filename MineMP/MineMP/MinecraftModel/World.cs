@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MineMP.MinecraftModel
 {
-    public class World
+    public struct World
     {
     }
 }
