@@ -27,7 +27,7 @@ A Powerful Minecraft Server For Java-Edition Written in C# with .NET Core
 |Android|x86 / x86_64 / arm32 / arm64|✔|
 |IOS|x86 / x86_64 / arm32 / arm64|✔|
 
-### .NET Support Table for Windows Form Microsoft Learn
+### .NET Support Table for Windows From Microsoft Learn
 <div><table>
 <thead>
 <tr>
