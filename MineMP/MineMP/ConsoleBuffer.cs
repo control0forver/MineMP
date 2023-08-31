@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace MineMP
 {
+    // From MineMP lib, written by LGF
+
     public class ConsoleBuffer
     {
         public ConsoleBuffer()
@@ -65,27 +67,27 @@ namespace MineMP
         // Events
         // Debug
         public delegate void DebugBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
-        public event DebugBufferAppendedEvent DebugBufferAppended;
+        public event DebugBufferAppendedEvent? DebugBufferAppended = null;
         // Info
         public delegate void InfoBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
-        public event InfoBufferAppendedEvent InfoBufferAppended;
+        public event InfoBufferAppendedEvent? InfoBufferAppended = null;
         // Warn
         public delegate void WarnBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
-        public event WarnBufferAppendedEvent WarnBufferAppended;
+        public event WarnBufferAppendedEvent? WarnBufferAppended = null;
         // Error
         public delegate void ErrorBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
-        public event ErrorBufferAppendedEvent ErrorBufferAppended;
+        public event ErrorBufferAppendedEvent? ErrorBufferAppended = null;
         // ControlSymbol
         public delegate void ControlSymbolBufferPushedEvent(ConsoleControlSymbolBufferPushedEventArgs e);
-        public event ControlSymbolBufferPushedEvent ControlSymbolBufferPushed;
+        public event ControlSymbolBufferPushedEvent? ControlSymbolBufferPushed = null;
         // Input
         private delegate void InputBufferPushedEvent(ConsoleInputBuffeePushedEventArgs e);
-        private event InputBufferPushedEvent InputBufferPushed;
+        private event InputBufferPushedEvent? InputBufferPushed = null;
         // ReadLine
         public delegate void ReadingInputLineEvent();
-        public event ReadingInputLineEvent ReadingInputLine;
+        public event ReadingInputLineEvent? ReadingInputLine = null;
         public delegate void ReadingInputLinePeekingEvent();
-        public event ReadingInputLinePeekingEvent ReadingInputLinePeeking;
+        public event ReadingInputLinePeekingEvent? ReadingInputLinePeeking = null;
 
         // Out
         public List<string> InfoBuffers { get; private set; } = new List<string>();
@@ -93,7 +95,7 @@ namespace MineMP
         public List<string> WarnBuffers { get; private set; } = new List<string>();
         public List<string> ErrorBuffers { get; private set; } = new List<string>();
         // Console Control
-        public Queue<ControlSymbols> ControlSymbolBuffers{ get; private set; } = new Queue<ControlSymbols>();
+        public Queue<ControlSymbols> ControlSymbolBuffers { get; private set; } = new Queue<ControlSymbols>();
 
         // In
         // Input
@@ -116,22 +118,26 @@ namespace MineMP
 
                     case BufferContentType.Info:
                         InfoBuffers.Add(Buffer);
-                        InfoBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                        if (InfoBufferAppended != null)
+                            InfoBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                     case BufferContentType.Debug:
                         DebugBuffers.Add(Buffer);
-                        DebugBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                        if (DebugBufferAppended != null)
+                            DebugBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                     case BufferContentType.Warn:
                         WarnBuffers.Add(Buffer);
-                        WarnBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                        if (WarnBufferAppended != null)
+                            WarnBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                     case BufferContentType.Error:
                         ErrorBuffers.Add(Buffer);
-                        ErrorBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                        if (ErrorBufferAppended != null)
+                            ErrorBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                 }
@@ -142,18 +148,20 @@ namespace MineMP
         }
         public void AppendFormatBuffer(BufferContentType ContentType, string format, params object[]? args)
         {
-            AppendBuffer(ContentType, string.Format(format, args));
+            AppendBuffer(ContentType, (args == null ? format : string.Format(format, args)));
         }
 
         public void MakeControl(ControlSymbols control)
         {
             ControlSymbolBuffers.Enqueue(control);
-            ControlSymbolBufferPushed(new ConsoleControlSymbolBufferPushedEventArgs(control));
+            if (ControlSymbolBufferPushed != null)
+                ControlSymbolBufferPushed(new ConsoleControlSymbolBufferPushedEventArgs(control));
         }
         public void MakeInputLine(string input_line)
         {
             InputBuffers.Add(input_line);
-            InputBufferPushed(new ConsoleInputBuffeePushedEventArgs(input_line));
+            if (InputBufferPushed != null)
+                InputBufferPushed(new ConsoleInputBuffeePushedEventArgs(input_line));
         }
         public string ReadLine(bool emptyBuffer = false, bool peeking = false)
         {
@@ -161,12 +169,14 @@ namespace MineMP
                 Clear();
             if (peeking)
             {
-                ReadingInputLinePeeking();
+                if (ReadingInputLinePeeking != null)
+                    ReadingInputLinePeeking();
                 return InputBuffers.Peek();
             }
-            
-            ReadingInputLine();
-            
+
+            if (ReadingInputLine != null)
+                ReadingInputLine();
+
             return InputBuffers.Take();
         }
         public void Clear()
@@ -177,7 +187,8 @@ namespace MineMP
 
         public void ClearBuffer()
         {
-            Task.Factory.StartNew(() => {
+            Task.Factory.StartNew(() =>
+            {
                 InfoBuffers.Clear();
                 DebugBuffers.Clear();
                 WarnBuffers.Clear();
