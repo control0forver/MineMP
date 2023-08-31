@@ -42,16 +42,16 @@ namespace MineMPShell
         }
 
         // Ignore
-        private static void ConsoleBuffer_ReadingInputLinePeeking()
+        private static void ConsoleBuffer_ReadingInputLinePeeking(object sender)
         {
         }
 
-        private static void ConsoleBuffer_ReadingInputLine()
+        private static void ConsoleBuffer_ReadingInputLine(object sender)
         {
             MineServer.ConsoleBuffer.MakeInputLine(Console.ReadLine());
         }
 
-        private static void ConsoleBuffer_ControlSymbolBufferPushed(ConsoleControlSymbolBufferPushedEventArgs e)
+        private static void ConsoleBuffer_ControlSymbolBufferPushed(object sender,ConsoleControlSymbolBufferPushedEventArgs e)
         {
             switch (e.BufferPushed)
             {
@@ -65,28 +65,28 @@ namespace MineMPShell
             return;
         }
 
-        private static void ConsoleBuffer_DebugBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        private static void ConsoleBuffer_DebugBufferAppended(object sender, ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor = ConsoleColor.Magenta;
             Console.Out.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 
-        private static void ConsoleBuffer_WarnBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        private static void ConsoleBuffer_WarnBufferAppended(object sender, ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.Out.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 
-        private static void ConsoleBuffer_InfoBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        private static void ConsoleBuffer_InfoBufferAppended(object sender, ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor = ConsoleColor.DarkGray;
             Console.Out.WriteLine(e.BufferAppended);
             Console.ResetColor();
         }
 
-        private static void ConsoleBuffer_ErrorBufferAppended(ConsoleBuffer.ConsoleBufferAppendEventArgs e)
+        private static void ConsoleBuffer_ErrorBufferAppended(object sender, ConsoleBuffer.ConsoleBufferAppendEventArgs e)
         {
             Console.BackgroundColor= ConsoleColor.Red;
             Console.Error.WriteLine(e.BufferAppended);

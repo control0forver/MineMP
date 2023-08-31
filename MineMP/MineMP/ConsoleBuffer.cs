@@ -17,10 +17,7 @@ namespace MineMP
             InputBufferPushed += ConsoleBuffer_InputBufferPushed;
         }
 
-        private void ConsoleBuffer_InputBufferPushed(ConsoleInputBuffeePushedEventArgs e)
-        {
-
-        }
+        private void ConsoleBuffer_InputBufferPushed(object _, ConsoleInputBuffeePushedEventArgs __) { }
 
         public class ConsoleBufferAppendEventArgs : EventArgs
         {
@@ -66,27 +63,27 @@ namespace MineMP
 
         // Events
         // Debug
-        public delegate void DebugBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
+        public delegate void DebugBufferAppendedEvent(object sender, ConsoleBufferAppendEventArgs e);
         public event DebugBufferAppendedEvent? DebugBufferAppended = null;
         // Info
-        public delegate void InfoBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
+        public delegate void InfoBufferAppendedEvent(object sender, ConsoleBufferAppendEventArgs e);
         public event InfoBufferAppendedEvent? InfoBufferAppended = null;
         // Warn
-        public delegate void WarnBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
+        public delegate void WarnBufferAppendedEvent(object sender, ConsoleBufferAppendEventArgs e);
         public event WarnBufferAppendedEvent? WarnBufferAppended = null;
         // Error
-        public delegate void ErrorBufferAppendedEvent(ConsoleBufferAppendEventArgs e);
+        public delegate void ErrorBufferAppendedEvent(object sender, ConsoleBufferAppendEventArgs e);
         public event ErrorBufferAppendedEvent? ErrorBufferAppended = null;
         // ControlSymbol
-        public delegate void ControlSymbolBufferPushedEvent(ConsoleControlSymbolBufferPushedEventArgs e);
+        public delegate void ControlSymbolBufferPushedEvent(object sender, ConsoleControlSymbolBufferPushedEventArgs e);
         public event ControlSymbolBufferPushedEvent? ControlSymbolBufferPushed = null;
         // Input
-        private delegate void InputBufferPushedEvent(ConsoleInputBuffeePushedEventArgs e);
+        private delegate void InputBufferPushedEvent(object sender, ConsoleInputBuffeePushedEventArgs e);
         private event InputBufferPushedEvent? InputBufferPushed = null;
         // ReadLine
-        public delegate void ReadingInputLineEvent();
+        public delegate void ReadingInputLineEvent(object sender);
         public event ReadingInputLineEvent? ReadingInputLine = null;
-        public delegate void ReadingInputLinePeekingEvent();
+        public delegate void ReadingInputLinePeekingEvent(object sender);
         public event ReadingInputLinePeekingEvent? ReadingInputLinePeeking = null;
 
         // Out
@@ -119,25 +116,25 @@ namespace MineMP
                     case BufferContentType.Info:
                         InfoBuffers.Add(Buffer);
                         if (InfoBufferAppended != null)
-                            InfoBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                            InfoBufferAppended(this, new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                     case BufferContentType.Debug:
                         DebugBuffers.Add(Buffer);
                         if (DebugBufferAppended != null)
-                            DebugBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                            DebugBufferAppended(this, new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                     case BufferContentType.Warn:
                         WarnBuffers.Add(Buffer);
                         if (WarnBufferAppended != null)
-                            WarnBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                            WarnBufferAppended(this, new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                     case BufferContentType.Error:
                         ErrorBuffers.Add(Buffer);
                         if (ErrorBufferAppended != null)
-                            ErrorBufferAppended(new ConsoleBufferAppendEventArgs(Buffer));
+                            ErrorBufferAppended(this, new ConsoleBufferAppendEventArgs(Buffer));
                         break;
 
                 }
@@ -155,13 +152,13 @@ namespace MineMP
         {
             ControlSymbolBuffers.Enqueue(control);
             if (ControlSymbolBufferPushed != null)
-                ControlSymbolBufferPushed(new ConsoleControlSymbolBufferPushedEventArgs(control));
+                ControlSymbolBufferPushed(this, new ConsoleControlSymbolBufferPushedEventArgs(control));
         }
         public void MakeInputLine(string input_line)
         {
             InputBuffers.Add(input_line);
             if (InputBufferPushed != null)
-                InputBufferPushed(new ConsoleInputBuffeePushedEventArgs(input_line));
+                InputBufferPushed(this, new ConsoleInputBuffeePushedEventArgs(input_line));
         }
         public string ReadLine(bool emptyBuffer = false, bool peeking = false)
         {
@@ -170,12 +167,12 @@ namespace MineMP
             if (peeking)
             {
                 if (ReadingInputLinePeeking != null)
-                    ReadingInputLinePeeking();
+                    ReadingInputLinePeeking(this);
                 return InputBuffers.Peek();
             }
 
             if (ReadingInputLine != null)
-                ReadingInputLine();
+                ReadingInputLine(this);
 
             return InputBuffers.Take();
         }
